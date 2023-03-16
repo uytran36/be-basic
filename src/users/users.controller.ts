@@ -8,6 +8,8 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
@@ -17,8 +19,11 @@ import { Query, UseFilters, UsePipes } from '@nestjs/common/decorators';
 import { HttpExceptionFilter } from 'src/common/http-exception.filter';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { JoiValidationPipe } from 'src/common/pipe/joi-validation.pipe';
+import { RolesGuard } from 'src/role/role.guard';
+import { Roles } from 'src/role/role.decorator';
 
 @Controller('users')
+@UseGuards(RolesGuard)
 // @UseFilters(new HttpExceptionFilter()) // you can put this here
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -26,6 +31,7 @@ export class UsersController {
   @Post()
   @UseFilters(HttpExceptionFilter)
   @UsePipes(new JoiValidationPipe(createUserSchema))
+  @SetMetadata('role', ['admin'])
   // with class-tranformer
   // create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
   create(@Body() createUserDto: CreateUserDto) {
@@ -52,7 +58,9 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
+  // Easier way to add role decorator than using @SetMetadata('role', ['admin'])
   @Patch(':id')
+  @Roles('admin')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
