@@ -22,4 +22,9 @@ export class User {
 
   @Column()
   phoneNumber: string;
+
+  @Column({
+    nullable: true,
+  })
+  salt: string;
 }

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,16 @@ export class UsersService {
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    const user = this.usersRepository.create(createUserDto);
+    const salt = bcrypt.genSaltSync(Math.floor(Math.random() * 3) + 10);
+    const hashedPassword = bcrypt.hashSync(createUserDto.password, salt);
+    const pwdWithPepper = bcrypt.hashSync(hashedPassword, process.env.PEPPER);
+
+    const user = this.usersRepository.create({
+      ...createUserDto,
+      password: pwdWithPepper,
+      salt: salt,
+    });
+
     this.usersRepository.save(user);
     return {
       message: 'User created successfully',
@@ -25,7 +35,11 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User> {
+  findOne(username: string): Promise<User | undefined> {
+    return this.usersRepository.findOneBy({ username });
+  }
+
+  findOneById(id: number): Promise<User | undefined> {
     return this.usersRepository.findOneBy({ id });
   }
 

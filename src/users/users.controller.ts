@@ -58,7 +58,7 @@ export class UsersController {
     )
     id: number,
   ) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOneById(+id);
   }
 
   // Easier way to add role decorator than using @SetMetadata('role', ['admin'])

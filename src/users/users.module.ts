@@ -9,6 +9,6 @@ import { User } from './entities/user.entity';
   controllers: [UsersController],
   providers: [UsersService],
   // for using the repository outside module
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, UsersService],
 })
 export class UsersModule {}
