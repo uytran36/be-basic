@@ -18,4 +18,9 @@ export class AppController {
   getProfile(@Request() req) {
     return req.user;
   }
+
+  @Post('auth/refresh-token')
+  refreshToken(@Request() req) {
+    return this.authService.getRefreshToken(req.body.refreshToken);
+  }
 }

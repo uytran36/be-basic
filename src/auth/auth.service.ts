@@ -43,4 +43,38 @@ export class AuthService {
       data: { userId: user.id, accessToken, refreshToken },
     };
   }
+
+  async logout(accessToken: string) {
+    return accessToken;
+  }
+
+  async getRefreshToken(refreshToken: string) {
+    const { username, sub } = this.jwtService.verify(refreshToken, {
+      secret: process.env.REFRESH_TOKEN_SECRET,
+    });
+
+    const accessToken = this.jwtService.sign(
+      { username, sub },
+      {
+        secret: process.env.ACCESS_TOKEN_SECRET,
+        expiresIn: '6h',
+      },
+    );
+
+    const newRefreshToken = this.jwtService.sign(
+      { username, sub },
+      {
+        secret: process.env.REFRESH_TOKEN_SECRET,
+        expiresIn: '30d',
+      },
+    );
+
+    return {
+      data: {
+        userId: sub,
+        accessToken,
+        refreshToken: newRefreshToken,
+      },
+    };
+  }
 }

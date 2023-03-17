@@ -23,6 +23,7 @@ import { JoiValidationPipe } from 'src/common/pipe/joi-validation.pipe';
 import { RolesGuard } from 'src/role/role.guard';
 import { Roles } from 'src/role/role.decorator';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
+import { Role } from 'src/role/role.enum';
 
 @Controller('users')
 @UseGuards(RolesGuard)
@@ -63,7 +64,7 @@ export class UsersController {
 
   // Easier way to add role decorator than using @SetMetadata('role', ['admin'])
   @Patch(':id')
-  @Roles('admin')
+  @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }

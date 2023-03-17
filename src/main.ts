@@ -1,14 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AuthGuard } from './auth/guards/auth.guard';
 import { ErrorsInterceptor } from './interceptors/error.interceptor';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useGlobalGuards(new AuthGuard());
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.REDIS,
+    options: {
+      host: 'localhost',
+      port: 6379,
+    },
+  });
+
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalInterceptors(new ErrorsInterceptor());
+  await app.startAllMicroservices();
   await app.listen(process.env.APP_PORT);
 }
 bootstrap();
