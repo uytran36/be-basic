@@ -16,7 +16,6 @@ import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from './users/entities/user.entity';
-import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 import { AuthModule } from './auth/auth.module';
 
 @Module({

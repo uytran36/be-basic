@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   HttpException,
@@ -15,7 +15,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './interfaces/users.interfaces';
+import { IUser } from './interfaces/users.interfaces';
 import { Query, UseFilters, UsePipes } from '@nestjs/common/decorators';
 import { HttpExceptionFilter } from 'src/common/http-exception.filter';
 import { ParseIntPipe } from '@nestjs/common/pipes';
@@ -24,6 +24,7 @@ import { RolesGuard } from 'src/role/role.guard';
 import { Roles } from 'src/role/role.decorator';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { Role } from 'src/role/role.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('users')
 @UseGuards(RolesGuard)
@@ -44,32 +45,49 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Query() query): Promise<User[]> {
-    if (query.id === 'a') {
-      throw new HttpException('error', HttpStatus.BAD_REQUEST);
-    }
-    return this.usersService.findAll();
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Query() query): Promise<IUser[]> {
+    const users = await this.usersService.findAll();
+    return users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+    }));
   }
 
   @Get(':id')
-  findOne(
+  @UseGuards(JwtAuthGuard)
+  async findOne(
     @Param(
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
   ) {
-    return this.usersService.findOneById(+id);
+    const data = await this.usersService.findOneById(+id);
+    return {
+      id: data.id,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      username: data.username,
+      phoneNumber: data.phoneNumber,
+    };
   }
 
   // Easier way to add role decorator than using @SetMetadata('role', ['admin'])
-  @Patch(':id')
-  @Roles(Role.Admin)
+  @Put(':id')
+  // @Roles(Role.Admin)
+  @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
+  @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
