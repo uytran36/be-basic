@@ -25,9 +25,12 @@ import { Roles } from 'src/role/role.decorator';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { Role } from 'src/role/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ValidationPipe } from 'src/common/pipe/validation.pipe';
+import { addBeerDto } from './dto/add-beer.dto';
 
 @Controller('users')
 @UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard)
 // @UseFilters(new HttpExceptionFilter()) // you can put this here
 @UseInterceptors(TransformInterceptor)
 export class UsersController {
@@ -36,17 +39,16 @@ export class UsersController {
   @Post()
   @UseFilters(HttpExceptionFilter)
   @UsePipes(new JoiValidationPipe(createUserSchema))
+  @SetMetadata('role', ['admin'])
   // with class-tranformer
   // create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
-  @SetMetadata('role', ['admin'])
   create(@Body() createUserDto: CreateUserDto) {
     // throw new HttpException('error', HttpStatus.NOT_FOUND);
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  async findAll(@Query() query): Promise<IUser[]> {
+  async findAll(): Promise<IUser[]> {
     const users = await this.usersService.findAll();
     return users.map((user) => ({
       id: user.id,
@@ -59,7 +61,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(
     @Param(
       'id',
@@ -81,7 +82,6 @@ export class UsersController {
   // Easier way to add role decorator than using @SetMetadata('role', ['admin'])
   @Put(':id')
   // @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
@@ -90,5 +90,19 @@ export class UsersController {
   @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Post('/cart')
+  addBeerToCart(@Body(new ValidationPipe()) addBeerDto: addBeerDto) {
+    return this.usersService.addBeerToCart(
+      addBeerDto.userId,
+      addBeerDto.beerId,
+      addBeerDto.quantity,
+    );
+  }
+
+  @Get('/cart/:id')
+  getCartByUserId(@Param('id') id: number) {
+    return this.usersService.getCartByUserId(id);
   }
 }

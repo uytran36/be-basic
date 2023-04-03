@@ -17,6 +17,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { BeersModule } from './beers/beers.module';
+import { Beer } from './beers/entities/beer.entity';
+import { BillsModule } from './bills/bills.module';
+import { Cart } from './users/entities/cart.entity';
 
 @Module({
   imports: [
@@ -30,9 +34,11 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [User, Beer, Cart],
       synchronize: true,
     }),
+    BeersModule,
+    BillsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { Cart } from './entities/cart.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -11,6 +12,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+
+    @InjectRepository(Cart)
+    private cartsRepository: Repository<Cart>,
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -49,5 +53,22 @@ export class UsersService {
 
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
+  }
+
+  addBeerToCart(userId: number, beerId: number, quantity: number) {
+    return this.cartsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Cart)
+      .values({ userId, beerId, quantity })
+      .execute();
+  }
+
+  getCartByUserId(userId: number): Promise<Cart | undefined> {
+    return this.cartsRepository
+      .createQueryBuilder()
+      .select()
+      .where({ userId })
+      .getOne();
   }
 }
