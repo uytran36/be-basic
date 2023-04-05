@@ -20,7 +20,10 @@ import { AuthModule } from './auth/auth.module';
 import { BeersModule } from './beers/beers.module';
 import { Beer } from './beers/entities/beer.entity';
 import { BillsModule } from './bills/bills.module';
-import { Cart } from './users/entities/cart.entity';
+import { BillBeer } from './bills/entities/billbeer.entity';
+import { Bill } from './bills/entities/bill.entity';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CartsModule } from './carts/carts.module';
 
 @Module({
   imports: [
@@ -34,11 +37,14 @@ import { Cart } from './users/entities/cart.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, Beer, Cart],
+      entities: [User, Beer, Bill, BillBeer],
       synchronize: true,
     }),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     BeersModule,
     BillsModule,
+    BillBeer,
+    CartsModule,
   ],
   controllers: [AppController],
   providers: [

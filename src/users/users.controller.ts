@@ -6,7 +6,7 @@ import {
   Put,
   Param,
   Delete,
-  HttpException,
+  // HttpException,
   HttpStatus,
   UseGuards,
   SetMetadata,
@@ -16,7 +16,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from './interfaces/users.interfaces';
-import { Query, UseFilters, UsePipes } from '@nestjs/common/decorators';
+import { UseFilters, UsePipes } from '@nestjs/common/decorators';
 import { HttpExceptionFilter } from 'src/common/http-exception.filter';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { JoiValidationPipe } from 'src/common/pipe/joi-validation.pipe';
@@ -25,8 +25,6 @@ import { Roles } from 'src/role/role.decorator';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { Role } from 'src/role/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ValidationPipe } from 'src/common/pipe/validation.pipe';
-import { addBeerDto } from './dto/add-beer.dto';
 
 @Controller('users')
 @UseGuards(RolesGuard)
@@ -90,19 +88,5 @@ export class UsersController {
   @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
-  }
-
-  @Post('/cart')
-  addBeerToCart(@Body(new ValidationPipe()) addBeerDto: addBeerDto) {
-    return this.usersService.addBeerToCart(
-      addBeerDto.userId,
-      addBeerDto.beerId,
-      addBeerDto.quantity,
-    );
-  }
-
-  @Get('/cart/:id')
-  getCartByUserId(@Param('id') id: number) {
-    return this.usersService.getCartByUserId(id);
   }
 }

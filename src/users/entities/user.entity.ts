@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Bill } from 'src/bills/entities/bill.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class User {
@@ -27,4 +28,7 @@ export class User {
     nullable: true,
   })
   salt: string;
+
+  @OneToMany(() => Bill, (bill) => bill.user)
+  bill: Bill[];
 }

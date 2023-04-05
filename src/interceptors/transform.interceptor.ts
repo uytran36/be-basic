@@ -24,7 +24,7 @@ export class TransformInterceptor<T>
       map((data) => ({
         status: response.statusCode,
         message: 'request successfully',
-        data,
+        data: data ? data : null,
       })),
     );
   }

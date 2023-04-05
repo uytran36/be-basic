@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BillBeer } from 'src/bills/entities/billbeer.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Beer {
@@ -16,4 +17,7 @@ export class Beer {
 
   @Column({ type: 'real' })
   price: number;
+
+  @OneToMany(() => BillBeer, (billBeer) => billBeer.beer)
+  billBeer: BillBeer[];
 }
