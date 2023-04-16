@@ -24,27 +24,31 @@ import { BillBeer } from './bills/entities/billbeer.entity';
 import { Bill } from './bills/entities/bill.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CartsModule } from './carts/carts.module';
+import { dataSourceOptions } from 'data-source';
+import { MigModule } from './mig/mig.module';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [User, Beer, Bill, BillBeer],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
+    // TypeOrmModule.forRoot({
+    //   type: 'postgres',
+    //   host: process.env.DB_HOST,
+    //   port: parseInt(process.env.DB_PORT),
+    //   username: process.env.DB_USERNAME,
+    //   password: process.env.DB_PASSWORD,
+    //   database: process.env.DB_NAME,
+    //   entities: [User, Beer, Bill, BillBeer],
+    //   synchronize: true,
+    // }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     BeersModule,
     BillsModule,
     BillBeer,
     CartsModule,
+    MigModule,
   ],
   controllers: [AppController],
   providers: [

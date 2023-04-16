@@ -19,6 +19,6 @@ export class Bill {
   @ManyToOne(() => User, (user) => user.bill)
   user: User;
 
-  @OneToMany(() => BillBeer, (billBeer) => billBeer.bill)
+  @OneToMany(() => BillBeer, (billBeer) => billBeer.bill, { cascade: true })
   billBeer: BillBeer[];
 }

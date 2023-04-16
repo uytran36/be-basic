@@ -29,6 +29,6 @@ export class User {
   })
   salt: string;
 
-  @OneToMany(() => Bill, (bill) => bill.user)
+  @OneToMany(() => Bill, (bill) => bill.user, { cascade: true })
   bill: Bill[];
 }

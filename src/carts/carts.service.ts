@@ -62,11 +62,6 @@ export class CartsService {
   async removeItems(id: string, beerId: number): Promise<ICart | null> {
     const cart = await this.cartModel.findById(id).exec();
     if (cart) {
-      const newCart = {
-        ...cart,
-        beers: cart.beers.filter((item) => item.beerId !== beerId),
-      };
-
       this.cartModel
         .updateOne(
           { _id: id },

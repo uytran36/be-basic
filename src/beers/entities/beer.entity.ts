@@ -18,6 +18,6 @@ export class Beer {
   @Column({ type: 'real' })
   price: number;
 
-  @OneToMany(() => BillBeer, (billBeer) => billBeer.beer)
+  @OneToMany(() => BillBeer, (billBeer) => billBeer.beer, { cascade: true })
   billBeer: BillBeer[];
 }
